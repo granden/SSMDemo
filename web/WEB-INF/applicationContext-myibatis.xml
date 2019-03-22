@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <context:annotation-config/>
+    <!--
+        当有多个全局配置文件的时候,有可能会出现重复扫描导致出错
+        这里的 <context:component-scan base-package="com.tronrun.exhibition">
+        指定了要扫描的包名但是下面的
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        指定排除扫描所有加了@Controller注解的类 注意排除两个字体
+        -->
+    <context:component-scan base-package="com.Lipt0n.test">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${database.driver}" />
+        <property name="url" value="${database.url}" />
+        <property name="username" value="${database.username}" />
+        <property name="password" value="${database.password}" />
+        <!--连接池的最大数据库连接数 -->
+        <property name="maxActive" value="${database.maxActive}" />
+        <!--最大等待连接中的数量 -->
+        <property name="maxIdle" value="${database.maxIdle}" />
+        <!--最大等待毫秒数 -->
+        <property name="maxWait" value="${database.maxWait}" />
+        <property name="defaultAutoCommit" value="true"/>
+    </bean>
+
+
+
+    <!--调用数据库的方法-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--引用数据库bean对象-->
+        <property name="dataSource" ref="dataSource" />
+        <!--引用MyBatis的配置文件的文件路径
+        注意路径是否对,否者运行出错很难发现问题,切记-->
+        <property name="configLocation" value="WEB-INF/sqlMapConfig.xml" />
+        <!--Mapper所在的文件路径(这里的*.xml表示所有.xml结尾的文件)
+        注意路径是否对,否者运行出错很难发现问题,切记-->
+        <!--Mapper文件的路径
+        注意路径是否对,否者运行出错很难发现问题,切记-->
+        <property name="mapperLocations" value="classpath*:com/Lipt0n/test/Mapper/*.xml" />
+    </bean>
+
+
+    <!--Mapper扫描配置-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--basePackage扫描的路径
+          注意路径是否对,否者运行出错很难发现问题,切记-->
+        <property name="basePackage" value="com.Lipt0n.test.Mapper"></property>
+        <!--传入sqlSessionFactoryBeanName对象,指向的是上面配置的sqlSessionFactory-->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+        <!--对注入标签@Repository生效-->
+        <property name="annotationClass" value="org.springframework.stereotype.Repository"></property>
+    </bean>
+
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+
+    <!--<tx:annotation-driven proxy-target-class="true" transaction-manager="txManager"/>-->
+
+
+    <!--使用下面的是代码通过规则事务日志的执行规则,上面是默认不做自定义规则,两个留一个就行-->
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="save*" propagation="REQUIRED"></tx:method>
+            <tx:method name="add*" propagation="REQUIRED"></tx:method>
+            <tx:method name="insert*" propagation="REQUIRED"></tx:method>
+            <tx:method name="update*" propagation="REQUIRED"></tx:method>
+            <tx:method name="delete*" propagation="REQUIRED"></tx:method>
+            <tx:method name="execute*" propagation="REQUIRED"></tx:method>
+            <tx:method name="batch*" propagation="REQUIRED"></tx:method>
+            <tx:method name="*" propagation="REQUIRED"/>
+            <tx:method name="*" rollback-for="Exception"/><!--默认回滚机制是RuntimeException-->
+            <tx:method name="get*" read-only="true" />
+            <tx:method name="count*" read-only="true" />
+            <tx:method name="select*" read-only="true" />
+            <tx:method name="load*" read-only="true" />
+            <tx:method name="find*" read-only="true" />
+            <tx:method name="list*" read-only="true" />
+            <tx:method name="cell*" read-only="true" />
+
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config>
+        <aop:pointcut id="service" expression="execution(* com.Lipt0n.test.Service.*.*(..))" /><!--声明所有包含Service的类的所有方法使用事务-->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="service" />
+    </aop:config>
+</beans>

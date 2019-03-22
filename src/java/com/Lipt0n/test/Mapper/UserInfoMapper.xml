@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.Lipt0n.test.Mapper.UserInfoMapper">
+
+    <insert id="insertUser" parameterType="com.Lipt0n.test.Beans.UserData">
+        insert into Lipt0n.UserInfo (
+        userId,password,username,phoneNumber,roleId,deptId)
+        values (#{userId},#{password},#{username},#{phoneNumber},#{roleId},#{deptId})
+    </insert>
+
+</mapper>
+

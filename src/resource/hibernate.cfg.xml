@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration SYSTEM
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd"
+        >
+
+<hibernate-configuration>
+  <session-factory>
+
+
+    <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property> <!--数据驱动我这里用的是mysql-->
+    <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/Lipt0n?useUnicode=true&amp;characterEncoding=UTF-8</property><!--数据库地址,把XXXX改成你自己的数据库名字-->
+    <property name="hibernate.connection.username">root</property>
+    <property name="hibernate.connection.password">root</property>
+    <property name="hibernate.hbm2ddl.auto">update</property> <!--每次执行Hibernate框架生成数据库表单的策略,推荐用update-->
+    <property name="hbm2ddl.auto">update</property>
+    <property name="show_sql">true</property><!--是否把框架自动执行数据库语句时的过程(执行的sql语句)打印到控制台-->
+    <!-- List of XML mapping files -->
+
+
+
+    <mapping class="com.Lipt0n.test.POJO.UserInfo"/><!--这个很重要,框架执行映射操作的类-->
+
+  </session-factory>
+</hibernate-configuration>
+

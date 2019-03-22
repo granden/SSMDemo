@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+
+    <!-- 属性文件读入 -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath*:jdbc.properties</value>  <!--指向数据库的配置文件-->
+                <value>classpath*:log4j.properties</value> <!--指向log4j框架的配置文件-->
+            </list>
+        </property>
+    </bean>
+
+    <!-- 自动扫描组件,让配置了@xxxx的标签生效 -->
+    <!--<context:component-scan base-package="com.tronrun.exhibition.*"/>-->
+    <context:component-scan base-package="com.Lipt0n.test">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+
+    <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+    <!--自定义拦截器-->
+    <!--<bean id="myAspect" class="com.tronrun.exhibition.Interceptor.MyInterceptor"></bean>-->
+
+
+    <!--<aop:config>
+        <aop:aspect ref="myAspect">
+            <aop:before method="before" pointcut="execution(* com.tronrun.exhibition.service.impl..*(..))"></aop:before>
+            <aop:after method="after" pointcut="execution(* com.tronrun.exhibition.service.impl..*(..))"></aop:after>
+            <aop:after-returning method="AfterReturning" pointcut="execution(* com.tronrun.exhibition.service.impl..*(..))"></aop:after-returning>
+            <aop:after-throwing method="AfterThrowing" pointcut="execution(* com.tronrun.exhibition.service.impl..*(..))"></aop:after-throwing>
+        </aop:aspect>
+    </aop:config>-->
+
+
+
+    <task:executor id="executor" pool-size="5" />
+    <task:scheduler id="scheduler" pool-size="10" />
+    <task:annotation-driven executor="executor" scheduler="scheduler" />
+
+
+</beans>
